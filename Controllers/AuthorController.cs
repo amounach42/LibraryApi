@@ -11,7 +11,7 @@ public class AuthorController : ControllerBase
 
     private static List<Author> authors = new List<Author>{ };
     private readonly DataContext context;
-    public AuthorController(DataContext context)
+    public AuthorController(DataContext context) 
     {
         this.context = context;
     }
@@ -19,7 +19,7 @@ public class AuthorController : ControllerBase
         [HttpGet]
         public async Task<ActionResult<List<Author>>> Get()
         {
-            return Ok(await context.Authors.ToListAsync());
+            return Ok(await context.Authors.Include(x=> x.Books).ToListAsync());
         }
         [HttpGet]
         [Route("{id}")]
@@ -28,7 +28,7 @@ public class AuthorController : ControllerBase
             var author = await context.Authors.FindAsync(id);
             if (author == null)
                 return NotFound("Author NOT found");
-            return Ok(author);
+            return Ok(await context.Authors.Where(x => x.Id == id).Include(x => x.Books).ToListAsync());        
         }
         [HttpPost]
         public async Task<ActionResult<Author>> Post(Author author)
